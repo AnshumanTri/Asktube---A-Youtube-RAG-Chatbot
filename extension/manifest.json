@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "AskTube",
+  "version": "1.0.0",
+  "description": "Ask questions about any YouTube video using AI, grounded in the actual transcript.",
+  "permissions": ["tabs", "storage", "sidePanel"],
+  "host_permissions": [
+    "http://localhost:8000/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "action": {
+    "default_title": "Open YouTube RAG Chatbot"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

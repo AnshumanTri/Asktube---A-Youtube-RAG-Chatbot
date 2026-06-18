@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AskTube</title>
+  <link rel="stylesheet" href="sidepanel.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1>AskTube</h1>
+      <button id="close-btn" class="btn-close" title="Close panel">&times;</button>
+    </header>
+
+    <!-- State 1: Not on a YouTube video -->
+    <div id="no-video-state" class="state hidden">
+      <p class="muted">Open a YouTube video to get started.</p>
+    </div>
+
+    <!-- State 2: On a video, not indexed yet -->
+    <div id="not-indexed-state" class="state hidden">
+      <p class="video-title" id="video-title-display"></p>
+      <button id="index-btn" class="btn-primary">Index this video</button>
+      <p id="index-status" class="status-text"></p>
+    </div>
+
+    <!-- State 3: Indexed, chat ready -->
+    <div id="chat-state" class="state hidden">
+      <p class="video-title" id="video-title-chat"></p>
+      <div id="chat-messages" class="chat-messages"></div>
+      <div class="chat-input-row">
+        <input
+          type="text"
+          id="question-input"
+          placeholder="Ask about this video..."
+          autocomplete="off"
+        />
+        <button id="send-btn" class="btn-send">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="sidepanel.js"></script>
+</body>
+</html>

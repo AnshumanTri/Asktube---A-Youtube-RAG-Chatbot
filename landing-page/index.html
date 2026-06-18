@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TubeRAG — AI Chatbot for YouTube</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:   #0a0e1a;
+      --navy2:  #0f1628;
+      --indigo: #4f46e5;
+      --violet: #7c3aed;
+      --lime:   #c8f135;
+      --orange: #ff6b2b;
+      --pink:   #f02d7d;
+      --cyan:   #06d6c7;
+      --white:  #f0f2ff;
+      --muted:  #8b93b0;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--navy);
+      color: var(--white);
+      font-family: 'Nunito', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 48px;
+      background: rgba(10,14,26,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .nav-logo {
+      font-family: 'PT Serif', serif;
+      font-weight: 800; font-size: 22px;
+      color: var(--white);
+      text-decoration: none;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .nav-logo span {
+      background: var(--lime);
+      color: var(--navy);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+    .nav-links { display: flex; align-items: center; gap: 36px; }
+    .nav-links a {
+      color: var(--muted); font-size: 14px; text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--white); }
+    .btn-ghost {
+      border: 1px solid rgba(255,255,255,0.2);
+      color: var(--white);
+      padding: 10px 22px; border-radius: 100px;
+      font-size: 14px; font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-ghost:hover { border-color: var(--lime); color: var(--lime); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+      position: relative; overflow: hidden;
+    }
+
+    /* Background blobs */
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.35;
+      pointer-events: none;
+    }
+    .blob-1 { width: 500px; height: 500px; background: var(--indigo); top: -100px; left: -100px; }
+    .blob-2 { width: 400px; height: 400px; background: var(--pink);   top: 100px;  right: -80px; opacity: 0.25; }
+    .blob-3 { width: 350px; height: 350px; background: var(--violet); bottom: 0;   left: 30%; opacity: 0.2; }
+
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-size: 13px; color: var(--muted);
+      margin-bottom: 32px;
+    }
+    .hero-eyebrow .dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--lime);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .hero h1 {
+      font-family: 'PT Serif', serif;
+      font-size: clamp(48px, 6vw, 88px);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      margin-bottom: 28px;
+      position: relative; z-index: 1;
+      max-width: 760px;
+      width: 100%;
+    }
+    .hero h1 .line-1 { display: block; color: var(--white); }
+    .hero h1 .line-2 {
+      display: block;
+      background: linear-gradient(90deg, var(--indigo), var(--pink), var(--orange));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero h1 .line-3 { display: block; color: var(--lime); }
+
+    .hero-sub {
+      font-size: clamp(16px, 2vw, 20px);
+      color: var(--muted);
+      max-width: 540px;
+      line-height: 1.6;
+      margin-bottom: 48px;
+      position: relative; z-index: 1;
+    }
+
+    .hero-ctas {
+      display: flex; gap: 14px; flex-wrap: wrap;
+      justify-content: center;
+      position: relative; z-index: 1;
+    }
+    .btn-primary {
+      background: var(--lime);
+      color: var(--navy);
+      padding: 14px 32px;
+      border-radius: 100px;
+      font-size: 15px; font-weight: 700;
+      text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(200,241,53,0.35);
+    }
+    .btn-secondary {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: var(--white);
+      padding: 14px 32px;
+      border-radius: 100px;
+      font-size: 15px; font-weight: 500;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.12); }
+
+    /* Floating tags */
+    .hero-tags {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      justify-content: center;
+      margin-top: 56px;
+      position: relative; z-index: 1;
+    }
+    .tag {
+      padding: 6px 14px; border-radius: 100px;
+      font-size: 12px; font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+    .tag-indigo { background: rgba(79,70,229,0.25); color: #a5b4fc; border: 1px solid rgba(79,70,229,0.4); }
+    .tag-pink   { background: rgba(240,45,125,0.2);  color: #f9a8d4; border: 1px solid rgba(240,45,125,0.35); }
+    .tag-lime   { background: rgba(200,241,53,0.15); color: var(--lime); border: 1px solid rgba(200,241,53,0.3); }
+    .tag-orange { background: rgba(255,107,43,0.2);  color: #fdba74;  border: 1px solid rgba(255,107,43,0.35); }
+    .tag-cyan   { background: rgba(6,214,199,0.15);  color: var(--cyan); border: 1px solid rgba(6,214,199,0.3); }
+
+    /* ── SECTIONS ── */
+    section { padding: 100px 24px; }
+    .container { max-width: 1100px; margin: 0 auto; }
+
+    .section-eyebrow {
+      display: inline-block;
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--lime);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: 'PT Serif', serif;
+      font-size: clamp(36px, 5vw, 60px);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+    .section-sub {
+      font-size: 17px; color: var(--muted);
+      max-width: 520px; line-height: 1.65;
+      margin-bottom: 64px;
+    }
+
+    /* ── HOW IT WORKS ── */
+    #how { background: var(--navy2); }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 2px;
+    }
+    .step {
+      background: var(--navy);
+      padding: 40px 32px;
+      position: relative;
+      transition: background 0.2s;
+    }
+    .step:hover { background: #111827; }
+    .step-num {
+      font-family: 'PT Serif', serif;
+      font-size: 64px; font-weight: 800;
+      line-height: 1;
+      margin-bottom: 20px;
+      opacity: 0.12;
+      position: absolute; top: 24px; right: 28px;
+    }
+    .step-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; margin-bottom: 20px;
+    }
+    .step h3 {
+      font-family: 'PT Serif', serif;
+      font-size: 20px; font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .step p { font-size: 14px; color: var(--muted); line-height: 1.65; }
+
+    /* ── FEATURES ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .feature-card {
+      background: var(--navy2);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px;
+      padding: 32px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .feature-card:hover {
+      border-color: rgba(79,70,229,0.5);
+      transform: translateY(-3px);
+    }
+    .feature-pill {
+      display: inline-block;
+      padding: 4px 12px; border-radius: 100px;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .feature-card h3 {
+      font-family: 'PT Serif', serif;
+      font-size: 20px; font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .feature-card p { font-size: 14px; color: var(--muted); line-height: 1.65; }
+
+    /* tech stack chips */
+    .tech-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .chip {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 12px; color: var(--muted);
+    }
+
+    /* ── INSTALL ── */
+    #install { background: var(--navy2); }
+
+    .install-steps { display: flex; flex-direction: column; gap: 0; max-width: 720px; }
+    .install-step {
+      display: flex; gap: 28px;
+      padding: 32px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .install-step:last-child { border-bottom: none; }
+    .install-num {
+      flex-shrink: 0;
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--indigo);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'PT Serif', serif;
+      font-size: 18px; font-weight: 800;
+      color: white;
+    }
+    .install-step h3 {
+      font-family: 'PT Serif', serif;
+      font-size: 18px; font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .install-step p { font-size: 14px; color: var(--muted); line-height: 1.65; }
+    code {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-size: 13px;
+      font-family: 'Courier New', monospace;
+      color: var(--cyan);
+    }
+
+    /* ── GITHUB CTA ── */
+    #github {
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .cta-blob-1 { width: 600px; height: 600px; background: var(--indigo); top: -200px; left: 50%; transform: translateX(-50%); opacity: 0.2; }
+    #github .container { position: relative; z-index: 1; }
+    #github .section-title { font-size: clamp(40px, 6vw, 80px); }
+    .github-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--white);
+      color: var(--navy);
+      padding: 16px 36px; border-radius: 100px;
+      font-size: 16px; font-weight: 700;
+      text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+      margin-top: 40px;
+    }
+    .github-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 40px rgba(240,242,255,0.2);
+    }
+    .github-btn svg { width: 22px; height: 22px; }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 32px 48px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px;
+    }
+    footer p { font-size: 13px; color: var(--muted); }
+
+    @media (max-width: 640px) {
+      nav { padding: 16px 20px; }
+      .nav-links { display: none; }
+      section { padding: 72px 20px; }
+      footer { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    TubeRAG <span>BETA</span>
+  </a>
+  <div class="nav-links">
+    <a href="#how">How it works</a>
+    <a href="#features">Features</a>
+    <a href="#install">Install</a>
+    <a href="https://github.com/YOUR_USERNAME/youtube-rag-chatbot" target="_blank" class="btn-ghost">GitHub →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+
+  <div class="hero-eyebrow">
+    <span class="dot"></span>
+    Agentic RAG · Chrome Extension · 100% Free Stack
+  </div>
+
+  <h1>
+    <span class="line-1">CHAT WITH</span>
+    <span class="line-2">ANY YOUTUBE</span>
+    <span class="line-3">VIDEO.</span>
+  </h1>
+
+  <p class="hero-sub">
+    An AI-powered Chrome extension that lets you ask questions, clear doubts, and take notes from any YouTube video — grounded in the actual transcript, zero hallucinations.
+  </p>
+
+  <div class="hero-ctas">
+    <a href="#install" class="btn-primary">
+      Install Extension ↓
+    </a>
+    <a href="https://github.com/YOUR_USERNAME/youtube-rag-chatbot" target="_blank" class="btn-secondary">
+      View on GitHub
+    </a>
+  </div>
+
+  <div class="hero-tags">
+    <span class="tag tag-indigo">LangGraph Agent</span>
+    <span class="tag tag-pink">Hybrid Retrieval</span>
+    <span class="tag tag-lime">Groq Llama 3.3 70B</span>
+    <span class="tag tag-orange">FAISS + BM25</span>
+    <span class="tag tag-cyan">RAGAS Evaluated</span>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="container">
+    <span class="section-eyebrow">The Process</span>
+    <h2 class="section-title">How it works</h2>
+    <p class="section-sub">Four steps from YouTube URL to grounded, cited answers — in seconds.</p>
+
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-icon" style="background:rgba(79,70,229,0.2);">📺</div>
+        <h3>Open any video</h3>
+        <p>Navigate to any YouTube video with captions. The extension auto-detects the video — no copy-pasting URLs.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-icon" style="background:rgba(200,241,53,0.15);">⚡</div>
+        <h3>Index in one click</h3>
+        <p>Hit "Index this video." The transcript is fetched, chunked with sentence-aware splitting, embedded locally, and stored in a FAISS vector index.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-icon" style="background:rgba(240,45,125,0.2);">🤖</div>
+        <h3>Agent retrieves</h3>
+        <p>Your question is rewritten for better retrieval, then a LangGraph agent runs hybrid BM25 + MMR semantic search with contextual compression.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-icon" style="background:rgba(255,107,43,0.2);">💬</div>
+        <h3>Grounded answer</h3>
+        <p>Llama 3.3 70B generates a detailed, tutor-style answer strictly from the transcript — with clickable timestamp citations to jump back in the video.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="container">
+    <span class="section-eyebrow">Under the Hood</span>
+    <h2 class="section-title">Built different.</h2>
+    <p class="section-sub">Not a wrapper around a single LLM call. A real agentic RAG system with a proper retrieval pipeline.</p>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-pill" style="background:rgba(79,70,229,0.2);color:#a5b4fc;">Agent</span>
+        <h3>LangGraph Agentic Loop</h3>
+        <p>A real state-machine agent that rewrites queries, retrieves, evaluates context quality, and retries — up to 3 iterations before answering. Not a single-shot chain.</p>
+        <div class="tech-chips">
+          <span class="chip">LangGraph</span>
+          <span class="chip">LangChain</span>
+          <span class="chip">StateGraph</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-pill" style="background:rgba(6,214,199,0.15);color:#06d6c7;">Retrieval</span>
+        <h3>Hybrid BM25 + MMR Search</h3>
+        <p>Sparse keyword search (BM25) fused with dense semantic MMR via Reciprocal Rank Fusion, then compressed by an LLM to extract only the relevant passage per chunk.</p>
+        <div class="tech-chips">
+          <span class="chip">FAISS</span>
+          <span class="chip">BM25</span>
+          <span class="chip">MMR</span>
+          <span class="chip">RRF</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-pill" style="background:rgba(200,241,53,0.15);color:#c8f135;">Generation</span>
+        <h3>Guardrails + Citations</h3>
+        <p>Prompt injection detection, strict grounding rules, and structured timestamp citations baked into every response. The LLM cannot answer from outside the transcript.</p>
+        <div class="tech-chips">
+          <span class="chip">Groq</span>
+          <span class="chip">Llama 3.3 70B</span>
+          <span class="chip">FastAPI</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-pill" style="background:rgba(240,45,125,0.2);color:#f9a8d4;">Evaluation</span>
+        <h3>RAGAS Evaluated</h3>
+        <p>Context precision, context recall, faithfulness, and answer relevancy measured on a held-out test set using RAGAS with a separate lightweight judge model.</p>
+        <div class="tech-chips">
+          <span class="chip">RAGAS</span>
+          <span class="chip">Llama 3.1 8B</span>
+          <span class="chip">HuggingFace</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-pill" style="background:rgba(255,107,43,0.2);color:#fdba74;">Extension</span>
+        <h3>Persistent Side Panel</h3>
+        <p>Manifest V3 side panel that stays open across tab switches. Per-video chat history persisted in chrome.storage.local — your notes survive if you switch videos and come back.</p>
+        <div class="tech-chips">
+          <span class="chip">Chrome MV3</span>
+          <span class="chip">Side Panel API</span>
+          <span class="chip">chrome.storage</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-pill" style="background:rgba(124,58,237,0.25);color:#c4b5fd;">Free Stack</span>
+        <h3>Zero Cost to Run</h3>
+        <p>Groq free tier for LLM inference. Local sentence-transformers for embeddings — no OpenAI, no Pinecone, no paid APIs. Backend deployed on Render free tier.</p>
+        <div class="tech-chips">
+          <span class="chip">Groq Free</span>
+          <span class="chip">sentence-transformers</span>
+          <span class="chip">Render</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INSTALL -->
+<section id="install">
+  <div class="container">
+    <span class="section-eyebrow">Get Started</span>
+    <h2 class="section-title">Install in 3 steps.</h2>
+    <p class="section-sub">The backend is already live. You just need the extension.</p>
+
+    <div class="install-steps">
+      <div class="install-step">
+        <div class="install-num">1</div>
+        <div>
+          <h3>Download the extension</h3>
+          <p>Clone or download the repo from GitHub. The extension files are in the <code>extension/</code> folder.</p>
+        </div>
+      </div>
+      <div class="install-step">
+        <div class="install-num">2</div>
+        <div>
+          <h3>Load into Chrome</h3>
+          <p>Go to <code>chrome://extensions</code>, enable <strong>Developer mode</strong>, click <strong>Load unpacked</strong>, and select the <code>extension/</code> folder.</p>
+        </div>
+      </div>
+      <div class="install-step">
+        <div class="install-num">3</div>
+        <div>
+          <h3>Open any YouTube video and start chatting</h3>
+          <p>Click the TubeRAG icon in your Chrome toolbar while on a YouTube video. Hit <strong>Index this video</strong>, then ask anything.</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 48px;">
+      <a href="#install" class="btn-primary" style="font-size:16px; padding: 16px 36px;">
+        Install Extension ↓
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- GITHUB CTA -->
+<section id="github" style="padding: 120px 24px;">
+  <div class="blob cta-blob-1" style="position:absolute;border-radius:50%;filter:blur(100px);"></div>
+  <div class="container">
+    <span class="section-eyebrow">Open Source</span>
+    <h2 class="section-title">
+      Built in public.<br/>
+      <span style="color:var(--muted); font-size: 0.75em;">Star it if it helped.</span>
+    </h2>
+    <p style="color:var(--muted); font-size:17px; max-width: 480px; line-height: 1.6; margin: 0 auto;">
+      Full source code — backend, extension, evaluation scripts. Fork it, break it, make it better.
+    </p>
+    <a href="https://github.com/YOUR_USERNAME/youtube-rag-chatbot" target="_blank" class="github-btn">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+      View on GitHub
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>TubeRAG — Agentic YouTube RAG Chatbot</p>
+  <p style="font-size:12px;">Built with FastAPI · LangGraph · Groq · Chrome MV3</p>
+</footer>
+
+</body>
+</html>

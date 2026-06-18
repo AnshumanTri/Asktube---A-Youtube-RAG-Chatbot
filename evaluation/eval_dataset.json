@@ -1,0 +1,31 @@
+{
+  "video_id": "nKSk_TiR8YA",
+  
+  "qa_pairs": [
+    {
+      "question": "What is the main topic of this video?",
+      "ground_truth": "in this video , the speaker explains how tokens work in a LLM"
+    },
+    {
+      "question": "what are tokens in a LLM?",
+      "ground_truth": "Tokens are the currency of a LLM. the speaker gives an example of text hello word being split into 3 tokens: hello, word, and a space. the more tokens you use, the more expensive it is to run the LLM."
+    },
+
+   
+    {
+      "question": "what is a tokenizer?",
+      "ground_truth": "A tokenizer is a component of an LLM that splits text into tokens and assigns them numerical IDs."
+    },
+   
+   
+   
+    {
+      "question": "What is the summary of the video?",
+      "ground_truth": "In summary, the video explains how tokens work in a LLM, including the process of tokenization, vocabulary size, and tokenizer training. It also discusses how to monitor token usage and the behavior of tokenizers when encountering unusual words or phrases."
+    },
+    {
+      "question": "how many kings are there in a deck of cards?",
+      "ground_truth": "I couldn't find that in the video transcript."
+    }
+  ]
+}
