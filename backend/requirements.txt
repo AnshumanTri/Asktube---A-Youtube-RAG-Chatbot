@@ -9,14 +9,14 @@ langchain-groq==0.2.1
 langgraph==0.2.38
 
 # Transcript
-youtube-transcript-api==0.6.2
+youtube-transcript-api==1.2.4
 yt-dlp>=2025.6.9
 
 # Embeddings (local)
 sentence-transformers==3.2.1
 
 # Vector store
-faiss-cpu==1.9.0
+faiss-cpu>=1.7.4
 
 # Hybrid retrieval
 rank-bm25==0.2.2
