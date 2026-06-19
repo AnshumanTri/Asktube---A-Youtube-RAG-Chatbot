@@ -12,7 +12,9 @@ langgraph==0.2.38
 youtube-transcript-api==1.2.4
 yt-dlp>=2025.6.9
 
-# Embeddings (local)
+# Embeddings (local) - force CPU-only torch (no CUDA) to fit Render's 512MB free-tier RAM limit
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
 sentence-transformers==3.2.1
 
 # Vector store
