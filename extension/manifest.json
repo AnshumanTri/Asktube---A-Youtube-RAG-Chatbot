@@ -4,9 +4,7 @@
   "version": "1.0.0",
   "description": "Ask questions about any YouTube video using AI, grounded in the actual transcript.",
   "permissions": ["tabs", "storage", "sidePanel"],
-  "host_permissions": [
-    "http://localhost:8000/*"
-  ],
+  "host_permissions": ["https://asktube-a-youtube-rag-chatbot-2.onrender.com/*"],
   "background": {
     "service_worker": "background.js"
   },

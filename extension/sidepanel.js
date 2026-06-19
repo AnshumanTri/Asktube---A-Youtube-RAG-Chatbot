@@ -1,4 +1,4 @@
-const BACKEND_URL = "http://localhost:8000"; // TODO: change to Render URL after deploy
+const BACKEND_URL = "https://asktube-a-youtube-rag-chatbot-2.onrender.com";
 
 // --- DOM refs ---
 const closeBtn = document.getElementById("close-btn");
